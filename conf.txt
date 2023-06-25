@@ -1,0 +1,9 @@
+center_x = 133.815
+center_y = 138.121
+center_z = 107.575
+
+size_x = 78
+size_y = 56
+size_z = 62
+
+exhaustiveness = 16

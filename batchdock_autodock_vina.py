@@ -80,7 +80,7 @@ for i in receptor_path:
 ligand_pdbqt_path = []
 for ligand in ligand_path:
     out_smi_temp = 'ligand/' + os.path.basename(ligand).split('.')[0].strip() + '.smi'
-    cmd = 'obabel -isdf ' + ligand + ' -osmi -O ' + out_smi_temp + ' -p 7.5'
+    cmd = 'obabel -isdf ' + '\'' + ligand + '\'' + ' -osmi -O ' + out_smi_temp + ' -p 7.5'
     print(cmd)
     os.system(cmd)
 
@@ -97,7 +97,7 @@ for ligand in ligand_path:
     # save converted file path to a list
     ligand_pdbqt_path.append(out_pdbqt_temp)
 
-    print(ligand + ' converted to '+ out_pdbqt_temp)
+    print(ligand + ' converted to ' + out_pdbqt_temp)
     del out_pdbqt_temp
     del out_sdf_temp
     del out_smi_temp

@@ -13,6 +13,8 @@ input:
 output:
     docked ligand files (pdbqt)
     log files (txt)
+    out_pdbqt_path.txt (a list of path of out pdbqt files)
+    out_pdbqt_log.txt (a list of path of out log files)
 
 file structure:
     batchdock_autodock_vina.py
@@ -77,17 +79,17 @@ for i in receptor_path:
 # convert ligands
 ligand_pdbqt_path = []
 for ligand in ligand_path:
-    out_smi_temp = 'ligand/' + os.path.basename(ligand).split('.')[0] + '.smi'
+    out_smi_temp = 'ligand/' + os.path.basename(ligand).split('.')[0].strip() + '.smi'
     cmd = 'obabel -isdf ' + ligand + ' -osmi -O ' + out_smi_temp + ' -p 7.5'
     print(cmd)
     os.system(cmd)
 
-    out_sdf_temp = 'ligand/' + os.path.basename(ligand).split('.')[0] + '_regen' + '.sdf'
+    out_sdf_temp = 'ligand/' + os.path.basename(ligand).split('.')[0].strip() + '_regen' + '.sdf'
     cmd = 'obabel -ismi ' + out_smi_temp + ' -osdf -O ' + out_sdf_temp + ' --gen3d --conformer --nconf 50 --systematic'
     print(cmd)
     os.system(cmd)
 
-    out_pdbqt_temp = 'ligand/' + os.path.basename(ligand).split('.')[0] + '_regen' + '.pdbqt'
+    out_pdbqt_temp = 'ligand/' + os.path.basename(ligand).split('.')[0].strip() + '_regen' + '.pdbqt'
     cmd = 'obabel -isdf ' + out_sdf_temp + ' -opdbqt -O ' + out_pdbqt_temp + ' -p 7.5 '
     print(cmd)
     os.system(cmd)

@@ -29,11 +29,24 @@ pdbqt_path = args.pdbqt_path
 def main():
     if not os.path.exists(pdbqt_path):
         raise FileNotFoundError(f'{pdbqt_path} not found')
-    for pdbqt_file in glob(f'{pdbqt_path}/*.pdbqt'):
+    def convert(pdbqt_file)
         pdb_file = pdbqt_file.replace('.pdbqt', '.pdb')
         cmd =f'obabel -ipdbqt {pdbqt_file} -opdb -O {pdb_file}'
         print(cmd)
         os.system(cmd)
+
+    # use multiprocessing to speed up conversion
+    import multiprocessing
+    from multiprocessing import Pool
+    # check number of cpu
+    cpu_nr = multiprocessing.cpu_count()
+    print(f'cpu number: {cpu_nr}')
+    if cpu_nr >= 8:
+        cpu_nr = 8
+
+    with Pool(cpu_nr) as p:
+        p.map(convert, glob(f'{pdbqt_path}/*.pdbqt'))
+
 
 
 if __name__ == '__main__':

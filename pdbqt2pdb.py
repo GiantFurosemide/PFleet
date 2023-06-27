@@ -29,7 +29,7 @@ pdbqt_path = args.pdbqt_path
 def main():
     if not os.path.exists(pdbqt_path):
         raise FileNotFoundError(f'{pdbqt_path} not found')
-    def convert(pdbqt_file)
+    def convert(pdbqt_file):
         pdb_file = pdbqt_file.replace('.pdbqt', '.pdb')
         cmd =f'obabel -ipdbqt {pdbqt_file} -opdb -O {pdb_file}'
         print(cmd)

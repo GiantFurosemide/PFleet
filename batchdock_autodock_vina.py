@@ -119,9 +119,9 @@ out_pdbqt_path = []
 out_log_path = []
 for receptor_rigid,receptor_flex in receptor_pdbqt_path:
     for ligand in ligand_pdbqt_path:
-        out_pdbqt_temp = 'output/' + os.path.basename(receptor_rigid).split('.')[0] + '/' + os.path.basename(ligand).split('.')[0] + '.pdbqt'
-        out_log_temp = 'output/' + os.path.basename(receptor_rigid).split('.')[0] + '/' + os.path.basename(ligand).split('.')[0] + '_log.txt'
-        cmd = f'{VINA_PATH} --config conf.txt --receptor ' + receptor_rigid + ' --flex ' + receptor_flex + ' --ligand ' + ligand + ' --out ' + out_pdbqt_temp + ' --log ' + out_log_temp
+        out_pdbqt_temp = 'output/' + '_'.join(os.path.basename(receptor_rigid).split('.')[0].split('_')[:-1]) + '/' + os.path.basename(ligand).split('.')[0] + '.pdbqt'
+        out_log_temp = 'output/' + '_'.join(os.path.basename(receptor_rigid).split('.')[0].split('_')[:-1]) + '/' + os.path.basename(ligand).split('.')[0] + '_log.txt'
+        cmd = f'{VINA_PATH} --config conf.txt --receptor ' + receptor_rigid + ' --ligand ' + ligand + ' --out ' + out_pdbqt_temp + ' --log ' + out_log_temp
         print(cmd)
         os.system(cmd)
         # save converted file path to a list

@@ -41,9 +41,12 @@ file structure:
 import os
 from glob import glob
 # 0
-# set output directory
+# set output directory & vaiables
 if not os.path.exists('output'):
     os.mkdir('output')
+OPEN_BABEL_PATH = 'obabel'
+VINA_PATH = 'vina'
+
 # 1
 # get receptor and ligand file paths
 receptor_path = glob('receptor/*.pdb')
@@ -65,32 +68,38 @@ for i in receptor_name:
 
 receptor_pdbqt_path = []
 for i in receptor_path:
-    out_pdbqt_temp = 'output/' + os.path.basename(i).split('.')[0] + '/' + os.path.basename(i).split('.')[0] + '.pdbqt'
-    cmd = 'obabel -ipdb ' + i + ' -opdbqt -O ' + out_pdbqt_temp + ' -p 7.5 -r -xr'
+    out_pdbqt_temp_rigid = 'output/' + os.path.basename(i).split('.')[0] + '/' + os.path.basename(i).split('.')[0] +'_rigid' + '.pdbqt'
+    cmd = f'{OPEN_BABEL_PATH} -ipdb ' + '\''+ i + '\'' + ' -opdbqt -O ' + out_pdbqt_temp_rigid + ' -p 7.5 -r -xr'
+    print(cmd)
+    os.system(cmd)
+
+    out_pdbqt_temp_flex = 'output/' + os.path.basename(i).split('.')[0] + '/' + os.path.basename(i).split('.')[0] +'_flex' + '.pdbqt'
+    cmd = f'{OPEN_BABEL_PATH} -ipdb ' + '\''+ i + '\'' + ' -opdbqt -O ' + out_pdbqt_temp_flex + ' -p 7.5 -r -xs'
     print(cmd)
     os.system(cmd)
 
     # save converted file path to a list
-    receptor_pdbqt_path.append(out_pdbqt_temp)
+    receptor_pdbqt_path.append((out_pdbqt_temp_rigid, out_pdbqt_temp_flex))
+    print(f"{i} converted to {out_pdbqt_temp_rigid} and {out_pdbqt_temp_flex}")
 
-    print(i + ' converted to '+ out_pdbqt_temp)
-    del out_pdbqt_temp
+    del out_pdbqt_temp_rigid
+    del out_pdbqt_temp_flex
 
 # convert ligands
 ligand_pdbqt_path = []
 for ligand in ligand_path:
     out_smi_temp = 'ligand/' + os.path.basename(ligand).split('.')[0].strip() + '.smi'
-    cmd = 'obabel -isdf ' + '\'' + ligand + '\'' + ' -osmi -O ' + out_smi_temp + ' -p 7.5'
+    cmd = f'{OPEN_BABEL_PATH} -isdf ' + '\'' + ligand + '\'' + ' -osmi -O ' + out_smi_temp + ' -p 7.5'
     print(cmd)
     os.system(cmd)
 
     out_sdf_temp = 'ligand/' + os.path.basename(ligand).split('.')[0].strip() + '_regen' + '.sdf'
-    cmd = 'obabel -ismi ' + out_smi_temp + ' -osdf -O ' + out_sdf_temp + ' --gen3d --conformer --nconf 50 --systematic'
+    cmd = f'{OPEN_BABEL_PATH} -ismi ' + out_smi_temp + ' -osdf -O ' + out_sdf_temp + ' --gen3d --conformer --nconf 50 --systematic'
     print(cmd)
     os.system(cmd)
 
     out_pdbqt_temp = 'ligand/' + os.path.basename(ligand).split('.')[0].strip() + '_regen' + '.pdbqt'
-    cmd = 'obabel -isdf ' + out_sdf_temp + ' -opdbqt -O ' + out_pdbqt_temp + ' -p 7.5 '
+    cmd = f'{OPEN_BABEL_PATH} -isdf ' + out_sdf_temp + ' -opdbqt -O ' + out_pdbqt_temp + ' -p 7.5 '
     print(cmd)
     os.system(cmd)
 
@@ -108,20 +117,20 @@ print(f" please check the config file (conf.txt) before running the script")
 # create a list to store path of out pdbqt files
 out_pdbqt_path = []
 out_log_path = []
-for receptor in receptor_pdbqt_path:
+for receptor_rigid,receptor_flex in receptor_pdbqt_path:
     for ligand in ligand_pdbqt_path:
-        out_pdbqt_temp = 'output/' + os.path.basename(receptor).split('.')[0] + '/' + os.path.basename(ligand).split('.')[0] + '.pdbqt'
-        out_log_temp = 'output/' + os.path.basename(receptor).split('.')[0] + '/' + os.path.basename(ligand).split('.')[0] + '_log.txt'
-        cmd = 'vina --config conf.txt --receptor ' + receptor + ' --ligand ' + ligand + ' --out ' + out_pdbqt_temp + ' --log ' + out_log_temp
+        out_pdbqt_temp = 'output/' + os.path.basename(receptor_rigid).split('.')[0] + '/' + os.path.basename(ligand).split('.')[0] + '.pdbqt'
+        out_log_temp = 'output/' + os.path.basename(receptor_rigid).split('.')[0] + '/' + os.path.basename(ligand).split('.')[0] + '_log.txt'
+        cmd = f'{VINA_PATH} --config conf.txt --receptor ' + receptor_rigid + ' --flex ' + receptor_flex + ' --ligand ' + ligand + ' --out ' + out_pdbqt_temp + ' --log ' + out_log_temp
         print(cmd)
         os.system(cmd)
         # save converted file path to a list
         out_pdbqt_path.append(out_pdbqt_temp)
         out_log_path.append(out_log_temp)
-        print(ligand + ' docked to ' + receptor)
+        print(ligand + ' docked to ' + receptor_rigid)
         del out_pdbqt_temp
         del out_log_temp
-    print(receptor + ' finished')
+    print(receptor_rigid + ' finished')
 
 # 4
 # save output path to a out_pdbqt_path.txt file

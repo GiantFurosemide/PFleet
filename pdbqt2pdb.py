@@ -33,7 +33,7 @@ def main():
         pdb_file = pdbqt_file.replace('.pdbqt', '.pdb')
         cmd =f'obabel -ipdbqt {pdbqt_file} -opdb -O {pdb_file}'
         print(cmd)
-        #os.system(cmd)
+        os.system(cmd)
 
 
 if __name__ == '__main__':

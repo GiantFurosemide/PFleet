@@ -17,6 +17,7 @@ usage:
 from glob import glob
 import os
 import argparse
+
 # set argparser
 parser = argparse.ArgumentParser()
 parser.add_argument('pdbqt_path', help='path to pdbqt files')
@@ -26,14 +27,16 @@ args = parser.parse_args()
 pdbqt_path = args.pdbqt_path
 
 
+def convert(pdbqt_file):
+    pdb_file = pdbqt_file.replace('.pdbqt', '.pdb')
+    cmd = f'obabel -ipdbqt {pdbqt_file} -opdb -O {pdb_file}'
+    print(cmd)
+    os.system(cmd)
+
+
 def main():
     if not os.path.exists(pdbqt_path):
         raise FileNotFoundError(f'{pdbqt_path} not found')
-    def convert(pdbqt_file):
-        pdb_file = pdbqt_file.replace('.pdbqt', '.pdb')
-        cmd =f'obabel -ipdbqt {pdbqt_file} -opdb -O {pdb_file}'
-        print(cmd)
-        os.system(cmd)
 
     # use multiprocessing to speed up conversion
     import multiprocessing
@@ -48,8 +51,5 @@ def main():
         p.map(convert, glob(f'{pdbqt_path}/*.pdbqt'))
 
 
-
 if __name__ == '__main__':
     main()
-
-

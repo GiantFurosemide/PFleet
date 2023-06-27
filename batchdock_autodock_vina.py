@@ -2,7 +2,7 @@
 This script is used to batch dock ligands to a receptor using autodock vina.
 
 requirements:
-    openbabel -> obabel
+    openbabel 2.4.90 -> obabel
     autodock vina -> vina
 
 input:

@@ -43,7 +43,7 @@ def convert(in_file: str, in_format: str = 'pdbqt', out_format: str = 'pdb'):
 
 
 # make partial function
-convert = partial(convert, in_format=in_format, out_format=out_format)
+convert_part = partial(convert, in_format=in_format, out_format=out_format)
 
 
 def main():
@@ -60,7 +60,7 @@ def main():
         cpu_nr = 8
 
     with Pool(cpu_nr) as p:
-        p.map(convert, glob(f'{pdbqt_path}/*.{in_format}'))
+        p.map(convert_part, glob(f'{pdbqt_path}/*.{in_format}'))
 
 
 if __name__ == '__main__':

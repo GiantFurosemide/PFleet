@@ -41,7 +41,7 @@ file structure:
 import os
 from glob import glob
 # 0
-# set output directory & vaiables
+# set output directory & variables
 if not os.path.exists('output'):
     os.mkdir('output')
 OPEN_BABEL_PATH = 'obabel'

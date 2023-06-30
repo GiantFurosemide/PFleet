@@ -87,9 +87,9 @@ def get_interact_residue_idx(data, threshold):
     print(f'threshold is: {threshold}')
 
     row_in_threshold = {}
-    for i, element in enumerate(threshold):
-        row_in_threshold[i] = [row_num for row_num, row in enumerate(data) if
-                               any(element <= threshold[i] for j, element in enumerate(row))]
+    for i, element_i in enumerate(threshold):
+        row_in_threshold[element_i] = [row_num for row_num, row in enumerate(data) if
+                               any(element_j <= threshold[i] for j, element_j in enumerate(row))]
     return row_in_threshold
 
 

@@ -19,6 +19,7 @@ import numpy as np
 import MDAnalysis as mda
 from MDAnalysis.analysis import distances
 import os
+import json
 
 # 0. varibales and utilities
 # set argparser
@@ -71,7 +72,35 @@ def report_ligand(u:mda.Universe):
     print(report)
     return len(u.atoms)
 
+def get_interact_residue_idx(data, threshold):
+    """
+    This function takes a numpy array called 'data' with a shape of (A, B) and a list called 'threshold' containing N float elements. It iterates over each element 'i' in the 'threshold' list, and for each row in the 'data' array, it checks if there is an element 'j' that is smaller than 'i'. If such an element exists, it records the index of that row.
+    :param data: numpy array
+    :param threshold: list
+    :return: row_indices: dict[threshold[i]: residue idx of mda university, ...]
+    """
+    print('residue idx start from 1!')
+    assert len(threshold) >= 1, "threshold list must contain at least one element"
+    print(f'threshold is: {threshold}')
 
+    row_in_threshold = {}
+    for i, element in enumerate(threshold):
+        row_in_threshold[i] = [row_num for row_num, row in enumerate(data) if
+                          any(element <= threshold[i] for i, element in enumerate(row))]
+    return row_in_threshold
+
+def write_residue_idx(data_dict:dict, output_path):
+    """
+    This function takes a dict called 'row_in_threshold' and write it to a txt file
+    :param row_in_threshold: dict
+    :param output_dir: str
+    :return: None
+    """
+
+    # 写入Json文件
+    assert output_path.endswith('.json'), 'output path must be csv file'
+    with open(output_path, 'w') as f:
+        json.dump(data_dict, f)
 
 # 1.get ligand atom
 # ligand pdbqt contains one ligand
@@ -125,6 +154,12 @@ dist_arr_sidechain = distances.distance_array(ligand_atoms.positions,  # referen
                                             sidechain_center_of_mass,
                                             box=u.dimensions)
 print(f'dist_arr_sidechain.shape(ligand atoms vs resi center of mass):\n {dist_arr_sidechain.shape}')
+
+# extract residue name with distance under threshold
+resids_residue = get_interact_residue_idx(dist_arr_residue, threshold=[7.0,6.5,5.5,4.5,4.0])
+resids_sidechain = get_interact_residue_idx(dist_arr_sidechain, threshold=[7.0,6.5,5.5,4.5,4.0])
+
+
 
 ## prepare for plot
 #ligand_atoms_nr = dist_arr_residue.shape[0]
@@ -190,7 +225,7 @@ print(f'dist_arr_sidechain.shape(ligand atoms vs resi center of mass):\n {dist_a
 #
 ## visualization() # visualization is not good enough and meaningful enough
 
-# save dist_arr
+# save distance array to csv file
 #a1, a2, a3 = dist_arr_residue.shape
 #np.savetxt('output/a.csv', dist_arr_residue.reshape((a2, a1 * a3)).T, delimiter=',')
 
@@ -200,6 +235,14 @@ np.savetxt(residue_out, dist_arr_residue.T, delimiter=',')
 print(f'save residue distance array to {residue_out}')
 np.savetxt(sidechain_out, dist_arr_sidechain.T, delimiter=',')
 print(f'save sidechain distance array to {sidechain_out}')
+
+# write residue idx to json file
+residue_out = f'{output_dir}/{ligand_name}_{receptor_name}_resids_residue.json'
+sidechain_out = f'{output_dir}/{ligand_name}_{receptor_name}_resids_sidechain.json'
+write_residue_idx(resids_residue, output_path=residue_out)
+write_residue_idx(resids_sidechain, output_path=sidechain_out)
+print(f'save residue idx to {residue_out}')
+print(f'save sidechain idx to {sidechain_out}')
 
 # read distance
 # data = np.loadtxt('output/a.csv', delimiter=',')

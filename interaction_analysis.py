@@ -160,9 +160,10 @@ dist_arr_sidechain = distances.distance_array(ligand_atoms.positions,  # referen
 print(f'dist_arr_sidechain.shape(ligand atoms vs resi center of mass):\n {dist_arr_sidechain.shape}')
 
 # extract residue name with distance under threshold
-resids_residue = get_interact_residue_idx(dist_arr_residue, threshold=[7.0, 6.5, 5.5, 4.5, 4.0])
-resids_sidechain = get_interact_residue_idx(dist_arr_sidechain, threshold=[7.0, 6.5, 5.5, 4.5, 4.0])
-
+resids_residue = get_interact_residue_idx(dist_arr_residue.T, threshold=[7.0, 6.5, 5.5, 4.5, 4.0])
+resids_sidechain = get_interact_residue_idx(dist_arr_sidechain.T, threshold=[7.0, 6.5, 5.5, 4.5, 4.0])
+print(f'resids_residue: {resids_residue}')
+print(f'resids_sidechain: {resids_sidechain}')
 ## prepare for plot
 # ligand_atoms_nr = dist_arr_residue.shape[0]
 # receptor_atoms_nr = dist_arr_residue.shape[1]

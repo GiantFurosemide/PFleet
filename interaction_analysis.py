@@ -39,9 +39,9 @@ receptor_name = os.path.basename(receptor_file).split('.')[0]
 
 # varibales
 
-#ligand_file = "/Users/muwang/PycharmProjects/PFleet/data/docking_result/AF-Q8NH18-F1-model_v4/2-BUTANONE_regen_ligand_1.pdbqt"
-#receptor_file = "data/receptor/AF-Q8NH18-F1-model_v4.pdb"
-#output_dir = './dist_output'
+# ligand_file = "/Users/muwang/PycharmProjects/PFleet/data/docking_result/AF-Q8NH18-F1-model_v4/2-BUTANONE_regen_ligand_1.pdbqt"
+# receptor_file = "data/receptor/AF-Q8NH18-F1-model_v4.pdb"
+# output_dir = './dist_output'
 
 
 # check if output_dir exsits and mkdir
@@ -52,8 +52,9 @@ assert os.path.exists(receptor_file), f'{receptor_file} not found'
 assert ligand_file.endswith('pdbqt'), f'{ligand_file} is not pdbqt file'
 assert receptor_file.endswith('pdb') or receptor_file.endswith('cif'), f'{receptor_file} is not pdb&cif file'
 
+
 # utilities
-def report_receptor(u:mda.Universe):
+def report_receptor(u: mda.Universe):
     protein = u.select_atoms('protein')
     report = f"""
     receptor file: {u.filename}
@@ -62,15 +63,17 @@ def report_receptor(u:mda.Universe):
     number of atoms: {len(protein.atoms)}
     """
     print(report)
-    return len(protein.segments),len(protein.residues),len(protein.atoms)
+    return len(protein.segments), len(protein.residues), len(protein.atoms)
 
-def report_ligand(u:mda.Universe):
+
+def report_ligand(u: mda.Universe):
     report = f"""
     receptor file: {u.filename}
     number of atoms: {len(u.atoms)}
     """
     print(report)
     return len(u.atoms)
+
 
 def get_interact_residue_idx(data, threshold):
     """
@@ -86,10 +89,11 @@ def get_interact_residue_idx(data, threshold):
     row_in_threshold = {}
     for i, element in enumerate(threshold):
         row_in_threshold[i] = [row_num for row_num, row in enumerate(data) if
-                          any(element <= threshold[i] for i, element in enumerate(row))]
+                               any(element <= threshold[i] for j, element in enumerate(row))]
     return row_in_threshold
 
-def write_residue_idx(data_dict:dict, output_path):
+
+def write_residue_idx(data_dict: dict, output_path):
     """
     This function takes a dict called 'row_in_threshold' and write it to a txt file
     :param row_in_threshold: dict
@@ -101,6 +105,7 @@ def write_residue_idx(data_dict:dict, output_path):
     assert output_path.endswith('.json'), 'output path must be csv file'
     with open(output_path, 'w') as f:
         json.dump(data_dict, f)
+
 
 # 1.get ligand atom
 # ligand pdbqt contains one ligand
@@ -142,7 +147,6 @@ for res in receptor_residues:
         sidechain_center_of_mass.append(np.nan)
 sidechain_center_of_mass = np.array(sidechain_center_of_mass)
 
-
 # distance anaylse
 dist_arr_residue = distances.distance_array(ligand_atoms.positions,  # reference
                                             # receptor_atoms.positions, # configuration
@@ -150,44 +154,42 @@ dist_arr_residue = distances.distance_array(ligand_atoms.positions,  # reference
                                             box=u.dimensions)
 print(f'dist_arr_residue.shape.shape(ligand atoms vs resi center of mass):\n {dist_arr_residue.shape}')
 dist_arr_sidechain = distances.distance_array(ligand_atoms.positions,  # reference
-                                            # receptor_atoms.positions, # configuration
-                                            sidechain_center_of_mass,
-                                            box=u.dimensions)
+                                              # receptor_atoms.positions, # configuration
+                                              sidechain_center_of_mass,
+                                              box=u.dimensions)
 print(f'dist_arr_sidechain.shape(ligand atoms vs resi center of mass):\n {dist_arr_sidechain.shape}')
 
 # extract residue name with distance under threshold
-resids_residue = get_interact_residue_idx(dist_arr_residue, threshold=[7.0,6.5,5.5,4.5,4.0])
-resids_sidechain = get_interact_residue_idx(dist_arr_sidechain, threshold=[7.0,6.5,5.5,4.5,4.0])
-
-
+resids_residue = get_interact_residue_idx(dist_arr_residue, threshold=[7.0, 6.5, 5.5, 4.5, 4.0])
+resids_sidechain = get_interact_residue_idx(dist_arr_sidechain, threshold=[7.0, 6.5, 5.5, 4.5, 4.0])
 
 ## prepare for plot
-#ligand_atoms_nr = dist_arr_residue.shape[0]
-#receptor_atoms_nr = dist_arr_residue.shape[1]
+# ligand_atoms_nr = dist_arr_residue.shape[0]
+# receptor_atoms_nr = dist_arr_residue.shape[1]
 #
 ## Define the number of subplots you want to create
-#num_subplots = int(sqrt(dist_arr_residue.shape[0] * dist_arr_residue.shape[1]) // ligand_atoms_nr) + 1
-#num_col_subplot = ceil(sqrt(dist_arr_residue.shape[0] * dist_arr_residue.shape[1]))
-#subplots_per_row = 1
+# num_subplots = int(sqrt(dist_arr_residue.shape[0] * dist_arr_residue.shape[1]) // ligand_atoms_nr) + 1
+# num_col_subplot = ceil(sqrt(dist_arr_residue.shape[0] * dist_arr_residue.shape[1]))
+# subplots_per_row = 1
 #
-#target_shape = [ligand_atoms_nr, int(num_col_subplot * num_subplots)]
-#assert target_shape[1] * num_subplots >= receptor_atoms_nr
-#new_array = np.ones(target_shape, dtype=dist_arr_residue.dtype) * 9999
-#new_array[:, :dist_arr_residue.shape[1]] = dist_arr_residue
-#dist_arr_residue = new_array
-#dist_arr_residue = dist_arr_residue.reshape([num_subplots, target_shape[0], num_col_subplot])
-#print(f'new dist_arr.shape: {dist_arr_residue.shape}')
+# target_shape = [ligand_atoms_nr, int(num_col_subplot * num_subplots)]
+# assert target_shape[1] * num_subplots >= receptor_atoms_nr
+# new_array = np.ones(target_shape, dtype=dist_arr_residue.dtype) * 9999
+# new_array[:, :dist_arr_residue.shape[1]] = dist_arr_residue
+# dist_arr_residue = new_array
+# dist_arr_residue = dist_arr_residue.reshape([num_subplots, target_shape[0], num_col_subplot])
+# print(f'new dist_arr.shape: {dist_arr_residue.shape}')
 
 ## Create the subplots
-#fig, axes = plt.subplots(num_subplots, subplots_per_row, figsize=(6, 10))
+# fig, axes = plt.subplots(num_subplots, subplots_per_row, figsize=(6, 10))
 #
 ## Flatten the axes array if necessary
-#if num_subplots == 1:
+# if num_subplots == 1:
 #    axes = np.array([axes])
 #
 #
 ## Iterate over each subplot and plot the corresponding data
-#def visualization():
+# def visualization():
 #    plt.subplots_adjust(left=0.1, right=0.9, bottom=0.1, top=0.9, wspace=2.9, hspace=0.9)
 #    for i, ax in enumerate(axes.flat):
 #        if i < num_subplots:
@@ -226,8 +228,8 @@ resids_sidechain = get_interact_residue_idx(dist_arr_sidechain, threshold=[7.0,6
 ## visualization() # visualization is not good enough and meaningful enough
 
 # save distance array to csv file
-#a1, a2, a3 = dist_arr_residue.shape
-#np.savetxt('output/a.csv', dist_arr_residue.reshape((a2, a1 * a3)).T, delimiter=',')
+# a1, a2, a3 = dist_arr_residue.shape
+# np.savetxt('output/a.csv', dist_arr_residue.reshape((a2, a1 * a3)).T, delimiter=',')
 
 residue_out = f'{output_dir}/{ligand_name}_{receptor_name}_dist_arr_residue.csv'
 sidechain_out = f'{output_dir}/{ligand_name}_{receptor_name}_dist_arr_sidechain.csv'

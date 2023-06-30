@@ -5,6 +5,10 @@ requirements:
     openbabel 2.4.90 -> obabel
     autodock vina -> vina
 
+usage:
+    copy this script to the directory containing receptor and ligand files
+    > python batchdock_autodock_vina.py
+
 input:
     receptor file (pdb) (already aligned and keep only the chain of interest, no ligands)
     ligand files (sdf)

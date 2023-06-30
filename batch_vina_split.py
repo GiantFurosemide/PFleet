@@ -36,6 +36,8 @@ input_dir = args.input_dir
 
 # get path of ligand files
 ligand_path = glob(input_dir + '/*/*.pdbqt')
+print()
+print(f'> {len(ligand_path)} ligand files found')
 
 
 def vina_split(in_file: str):
@@ -49,17 +51,17 @@ def write_split_ligands(out_path: str = 'output/batch_vina_split_results.csv'):
     with open(out_path, 'w') as f:
         # /Users/muwang/PycharmProjects/PFleet/data/docking_result/AF-Q8NH18-F1-model_v4/2-BUTANONE_regen_ligand_5.pdbqt
 
-        f.write('receptor_path, ligand_name, ligand_path\n')
+        f.write('receptor_path,ligand_name,ligand_path\n')
         split_ligand_path = glob(input_dir + '/*/*_ligand_?.pdbqt')
 
         def get_names(path):
-            receptor_name = 'receptor/' + path.split('/')[-2]+'.cif'
+            receptor_name = 'receptor/' + path.split('/')[-2]+'.pdb'
             ligand_name = 'ligand/' + os.path.basename(path).split('_regen_')[0]+'_regen.sdf'
             return receptor_name, ligand_name, path
 
         for ligand in split_ligand_path:
             receptor, ligand, result_lig = get_names(ligand)
-            f.write(f'{receptor}, {ligand}, {result_lig}\n')
+            f.write(f'{receptor},{ligand},{result_lig}\n')
     print(f'> save results to {out_path}')
 
 

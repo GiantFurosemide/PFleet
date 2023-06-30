@@ -3,6 +3,10 @@ A python package to annotate, manipulate(select/extract/combine), visualize mult
 
 # protocol
 * batch autodock: 
-  * batchdock_autodock_vina.py
+  ```bast
+  python batchdock_autodock_vina.py
+  ```
 * analysis :
-  * interaction_analysis.py
+  ```bash 
+  python interaction_analysis.py -il input_ligand -ir input_receptor [-o output_dir]
+  ```
